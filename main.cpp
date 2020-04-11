@@ -48,16 +48,18 @@ public:
         }
     }
 
-    Connection(std::string_view address)
+    Connection()
     {
         sock_ = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (sock_ == -1)
         {
             throw std::system_error(errno, std::system_category(), "Failed to create socket");
         }
+    }
 
+    void Connect(std::string_view address)
+    {
         Address addr(address, 80);
-
 
         if (::connect(sock_, addr, addr.size()) == -1)
         {
@@ -160,7 +162,9 @@ int main(int argc, char* argv[])
 
     try
     {
-        auto conn = Connection{remoteHost};
+        Connection conn{};
+
+        conn.Connect(remoteHost);
 
         std::cout << "Remote address is " << conn.GetPeerName() << std::endl;;
 
